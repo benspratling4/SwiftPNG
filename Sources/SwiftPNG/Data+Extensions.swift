@@ -8,6 +8,10 @@
 
 import Foundation
 
+public enum MsbUin32Error : Error {
+	case insufficientCount(Int)
+}
+
 ///The factories should use the BitStream instead
 extension Data {
 	///these bits are LSB first, not MSB first like human writing
@@ -69,5 +73,17 @@ extension Data {
 		var bytes:[UInt8] = Array<UInt8>(repeating: 0, count: count)
 		copyBytes(to: &bytes, from: at.byte..<newCursor.byte)
 		return (bytes, newCursor)
+	}
+	
+	
+	func readMSBFixedWidthUInt<Result>(at offset:Int)throws->Result where Result:FixedWidthInteger, Result:UnsignedInteger {
+		let byteCount:Int = Result.bitWidth / 8
+		guard count >= offset + byteCount else {
+			throw MsbUin32Error.insufficientCount(offset)
+		}
+		let placeHolder:Result = withUnsafeBytes { pointer in
+			return pointer.load(fromByteOffset: offset, as: Result.self)
+		}
+		return Result(bigEndian: placeHolder)
 	}
 }

@@ -42,3 +42,25 @@ public struct ColorPallette {
 	}
 	
 }
+
+
+extension Data {
+	///self is an array of indexes into the palette, output is rgb data
+	func colored(with palette:ColorPallette, transparency:TransparencyTable?)->Data {
+		let includesTransparency:Bool = transparency != nil
+		let scaleI:Int = includesTransparency ? 4 : 3
+		var outputData = Data(repeating: 0, count: count * scaleI)
+		for i in 0..<count {
+			let index:Int = Int(self[i])
+			let color = palette.colors[index]
+			outputData[scaleI*i..<scaleI*i+2] = Data([color.red, color.green, color.blue])
+			if includesTransparency
+				,let table = transparency {
+				outputData[scaleI*i+3] = table.transparency(index: index)
+			}
+		}
+		return outputData
+	}
+	
+	
+}

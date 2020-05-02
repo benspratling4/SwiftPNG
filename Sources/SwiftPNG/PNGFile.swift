@@ -14,17 +14,15 @@ public enum PNGFileError : Error {
 	case unsupportedFormat
 }
 
-
 ///Directly represents the format of a .png file
-///	TODO: 1-4 bit support
-/// TODO: pallette colors
+///	TODO: 1-4 bit support when interlacing
 /// TODO: tIME chunk
-/// TODO: tRNS chunk
+/// TODO: tRNS chunk	- transparency
 /// TODO: zTXt, tEXt, iTXt, chunks
 /// TODO: iCCP, cHRM, sRGB chunks
 /// TODO: streaming support
 
-///TODO: 1-4-bit, pallette colors, text, transparency, color profile support
+///TODO: 1-4-bit, text, transparency, color profile support
 public class PNGFile {
 	
 	///i.e. init with the contents of a file
@@ -68,6 +66,9 @@ public class PNGFile {
 			let gammaInt:UInt32 = reader.readInt()
 			let gammaFloat:Float32 = Float32(gammaInt)
 			self.gamma = gammaFloat / 100_000.0
+		}
+		if let transparencyChunk = chunkInfos.filter({ $0.codeAsString == "tRNS"}).first {
+			transparency = TransparencyTable(data: data, info: transparencyChunk, colorType:header.colorType)
 		}
 		try divideUnrecognizedChunks(data:data, infos: chunkInfos)
 	}
@@ -127,6 +128,8 @@ public class PNGFile {
 	public var header:ImageHeader
 	
 	public var colorPallette:ColorPallette?
+	
+	public var transparency:TransparencyTable?
 	
 	public var gamma:Float32?
 	
@@ -269,27 +272,27 @@ public class PNGFile {
 	
 	///fully decompressed, unfiltered, and ready to use in an image
 	func imageData()->Data {
-		if let pallet = self.colorPallette {
-			return palettizedImageData()
-		}
 		//the data will be what it is once we deinterlace & unfilter it
 		let panesFilteredData:[(InterlacedPane.InterlacePattern, Data, Int, Int)] = interlacePanesFilteredData()
 		let unfilteredData:[InterlacedPane] = panesFilteredData.map({ (pattern, data, width, height) -> InterlacedPane in
 			let newData:Data = unfilterPaneData(data: data, width: width, height: height)
 			return InterlacedPane(pattern: pattern, width: width, height: height, data: newData)
 		})
+		let stitchedData:Data
 		if header.bitDepth >= 8 {
-			return unfilteredData.stichTogether(header: header)
+			stitchedData = unfilteredData.stichTogether(header: header)
+		} else {
+			stitchedData = unfilteredData.stitchTogetherLowBitDepthRaw(header: header)
 		}
-		//TODO: expand the bits into pixels
-		fatalError("expand the bits into pixels")
+		guard let pallet = self.colorPallette else {
+			if header.bitDepth >= 8 {
+				return stitchedData
+			}
+			return stitchedData.expandRawBits(from:Int(header.bitDepth))
+		}
+		return stitchedData.colored(with:pallet, transparency:transparency)
 	}
 	
-	func palettizedImageData()->Data {
-		//TODO: write me
-		//if
-		fatalError("write palettizedImageData")
-	}
 	
 	var gammaChunk:Chunk? {
 		guard let gamma = self.gamma else { return nil }

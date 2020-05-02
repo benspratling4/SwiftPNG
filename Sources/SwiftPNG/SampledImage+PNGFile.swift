@@ -23,7 +23,8 @@ extension SampledImage {
 		let imageData:Data = pngFile.imageData()
 		var bytes:[UInt8] = [UInt8](repeating:0, count:imageData.count)
 		imageData.copyBytes(to: &bytes, count: imageData.count)
-		self.init(width: Int(pngFile.header.width), height: Int(pngFile.header.height), colorSpace: GenericRGBAColorSpace(hasAlpha:pngFile.header.colorType.contains(.alphaChannelUsed)), bytes: bytes)
+		let usesAlpha:Bool = pngFile.header.colorType.contains(.alphaChannelUsed) || pngFile.transparency != nil
+		self.init(width: Int(pngFile.header.width), height: Int(pngFile.header.height), colorSpace: GenericRGBAColorSpace(hasAlpha:usesAlpha), bytes: bytes)
 	}
 	
 	///designated way to get a 
