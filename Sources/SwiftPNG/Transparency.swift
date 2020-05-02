@@ -7,7 +7,7 @@
 
 import Foundation
 
-
+//TODO: add support when decoding true color & grayscale images for providing an alpha channel value
 
 public struct TransparencyTable {
 	

@@ -71,7 +71,17 @@ public class PNGFile {
 			transparency = TransparencyTable(data: data, info: transparencyChunk, colorType:header.colorType)
 		}
 		try divideUnrecognizedChunks(data:data, infos: chunkInfos)
+		
+		var txtRecords:[TextRecord] = chunkInfos.filter({$0.codeAsString == TextChunck.chunkCode}).compactMap({ TextChunck(data: data, info: $0)?.textRecord })
+		var compressedTextRecords:[TextRecord] = chunkInfos.filter({$0.codeAsString == CompressedTextChunk.chunkCode}).compactMap({ CompressedTextChunk(data: data, info: $0)?.textRecord })
+		txtRecords.append(contentsOf: compressedTextRecords)
+		textRecords = txtRecords
+		internationalTextRecords = chunkInfos.filter({$0.codeAsString == InternationalTextChunk.chunkCode}).compactMap({ InternationalTextChunk(data: data, info: $0)?.textRecord })
 	}
+	
+	//supported when reading, TODO: writing
+	var textRecords:[TextRecord]?
+	var internationalTextRecords:[InterntionalTextRecord]?
 	
 	public init(header:ImageHeader, filteredImageData:Data) {
 		self.header = header
@@ -285,6 +295,7 @@ public class PNGFile {
 			stitchedData = unfilteredData.stitchTogetherLowBitDepthRaw(header: header)
 		}
 		guard let pallet = self.colorPallette else {
+			//TODO: if there is a transparency table use it
 			if header.bitDepth >= 8 {
 				return stitchedData
 			}

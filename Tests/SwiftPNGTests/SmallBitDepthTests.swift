@@ -50,8 +50,6 @@ class SmallBitDepthTests : XCTestCase {
 	}
 	
 	
-	
-	
 	func testOpeningTransparencyFiles() {
 		let names:[String] = [
 //		"spectrumTestTransTrueColorInter",
@@ -87,5 +85,4 @@ class SmallBitDepthTests : XCTestCase {
 	}
 	
 }
-
 
