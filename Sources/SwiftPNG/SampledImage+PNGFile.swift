@@ -7,7 +7,6 @@
 
 import Foundation
 import SwiftGraphicsCore
-import SwiftSampledGraphics
 
 
 extension SampledImage {

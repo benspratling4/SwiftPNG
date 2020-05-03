@@ -8,7 +8,7 @@
 import Foundation
 import XCTest
 @testable import SwiftPNG
-import SwiftSampledGraphics
+import SwiftGraphicsCore
 
 
 class SmallBitDepthTests : XCTestCase {

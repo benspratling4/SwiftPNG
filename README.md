@@ -1,7 +1,10 @@
 # SwiftPNG
 Pure-Swift implementation of PNG file encoding and decoding
 
-WIP: implements some encoding and decoding and algorithms, for some bit depths.
+WIP: implements some encoding and decoding and algorithms, for some bit depths.  
+
+PNG file format spec:
+http://www.libpng.org/pub/png/spec/1.2/PNG-Contents.html
 
 ## Decoding
 

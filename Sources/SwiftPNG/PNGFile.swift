@@ -14,6 +14,9 @@ public enum PNGFileError : Error {
 	case unsupportedFormat
 }
 
+
+//based on http://www.libpng.org/pub/png/spec/1.2/PNG-Contents.html
+
 ///Directly represents the format of a .png file
 ///	TODO: 1-4 bit support when interlacing
 /// TODO: tIME chunk
