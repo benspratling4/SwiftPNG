@@ -354,11 +354,12 @@ public class PNGFile {
 		compressedData.insert(contentsOf: [0x78, 0x01], at: 0)
 		//compressedData.append(contentsOf:check.msbBytes)
 		//divide image data into chunks...
-		while compressedData.count > 0 {
-			let byteCountToCopy:Int = min(compressedData.count, 4096)
-			let chunk = Chunk(code: "IDAT", data: Data(compressedData[0..<byteCountToCopy]))!
+		var compressedDataIndex:Int = 0
+		while compressedDataIndex < compressedData.count {
+			let byteCountToCopy:Int = min(compressedData.count - compressedDataIndex, 4096)
+			let chunk = Chunk(code: "IDAT", data: Data(compressedData[compressedDataIndex..<compressedDataIndex+byteCountToCopy]))!
 			allData.append(chunk.serializedData)
-			compressedData.removeFirst(byteCountToCopy)
+			compressedDataIndex += byteCountToCopy
 		}
 		
 		//post-idat chunks
