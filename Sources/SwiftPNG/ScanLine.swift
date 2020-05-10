@@ -63,7 +63,9 @@ struct ScanLine {
 					return x &+ b
 				case .average:
 					let orig:UInt8 = isFirstOnLine ? 0 : a
-					return x &+ UInt8(UInt16(b) &+ UInt16(orig)/2)
+					let average:Int16 = Int16((UInt16(b) &+ UInt16(orig))/2)
+					let signedX:Int16 = Int16(Int8(bitPattern:x))
+					return UInt8(clamping:average &+ signedX)
 				case .paeth:
 					return x &+ paethPredictor(a:a, b:b, c:c)
 			}
@@ -126,7 +128,9 @@ struct ScanLine {
 				return x &- b
 			case .average:
 				let orig:UInt8 = isFirstOnLine ? 0 : a
-				return x &- UInt8((UInt16(b) &+ UInt16(orig))/2)
+				let average:Int16 = Int16(clamping:(UInt16(b) &+ UInt16(orig))/2)
+				let diff:Int16 = Int16(x) - average
+				return UInt8(bitPattern: Int8(clamping:diff))
 			case .paeth:
 				return x &- paethPredictor(a:a, b:b, c:c)
 			}
