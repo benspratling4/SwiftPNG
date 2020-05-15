@@ -30,7 +30,7 @@ class BezierRenderingTests : XCTestCase {
 			,and:Point(x: 50.0, y: 25.0)
 			,to:Point(x: 35.0, y: 40.0))
 		path3.close()
-		context.fillPath(path3, color:colorSpace.black)
+		context.drawPath(path3, fillShader: SolidColorShader(color: colorSpace.black), stroke: nil)
 		
 		
 //		var path3:Path = Path(subPaths: [])
@@ -63,14 +63,14 @@ class BezierRenderingTests : XCTestCase {
 		context.antialiasing = .subsampling(resolution: .three)
 		
 		let path = Path(inRect:Rect(origin:.zero, size:Size(width: 50.0, height: 50.0)))
-		context.fillPath(path, color:SampledColor(components:[[0x00], [0xFF], [0x00], [0xFF]]))
+		context.drawPath(path, fillShader: SolidColorShader(color: SampledColor(components:[[0x00], [0xFF], [0x00], [0xFF]])), stroke: nil)
 		
 		var path3:Path = Path(subPaths: [])
 			.byMoving(to:Point(x:10.0, y: 15.0))
 		path3.addCurve(near: Point(x:25.0, y: 45.0), to: Point(x:40.0, y: 15.0))
 	//	path3.addLine(to:Point(x:40.0, y: 25.0))
-		context.fillPath(path3, color:colorSpace.white)
-		context.strokePath(path3, color:colorSpace.black, lineWidth:2.0)
+		context.drawPath(path3, fillShader: SolidColorShader(color:colorSpace.white), stroke: nil)
+		context.drawPath(path3, fillShader:nil, stroke:(SolidColorShader(color:colorSpace.black), StrokeOptions(lineWidth:2.0)))
 		
 		guard let pngData = context.image.pngData else {
 			XCTFail("couldn't get png data")
@@ -104,7 +104,7 @@ class BezierRenderingTests : XCTestCase {
 			.byAddingLine(to: Point(x: 31.63, y: 29.14))
 			.byAddingLine(to: Point(x: 18.23, y: 29.14))
 		
-		context.fillPath(aPath, color:colorSpace.black)
+		context.drawPath(aPath, fillShader: SolidColorShader(color:colorSpace.black), stroke: nil)
 		
 		guard let pngData = context.image.pngData else {
 			XCTFail("couldn't get png data")
